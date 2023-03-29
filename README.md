@@ -13,3 +13,41 @@
 - Python
 - JupiterHub
 - Exel
+
+## Библиотеки для работы с Exel
+
+```
+#pip install pandas
+#pip install openpyxl
+
+import pandas as pd
+import numpy as np
+import os
+import openpyxl
+from openpyxl import load_workbook
+from openpyxl import Workbook
+```
+
+После, загрузили Exel-файлы, проверили, что нужные нам листы открываются верно. И можно делать объединение с помощью merge. Сразу же можем убрать ненужные столбцы.
+
+```
+Alpha_join = file_domena.merge(file_fio, how = 'inner', left_on = 'USERS', right_on = 'domena_login')
+Alpha_join = Alpha_join.drop(columns=['Подразделение 2', 'Подразделение 3', 'Должность', 'domena_login', 'domenb_login'])
+Alpha_join.head()
+```
+![image](https://user-images.githubusercontent.com/100629361/228647182-e0218914-1bc5-4bb0-b285-9823f295327f.png)
+
+Завершив объединение таблиц и создав новые датафрэймы с обновленными данными можем приступить к обновлению первоначальной таблицы.
+```
+# Беоем исходный файл для добавления обновленных листов
+wb = openpyxl.load_workbook('статистика.xlsx') 
+```
+
+Заменяем старые листы в Exel-файле новыми датафрэймами.
+```
+with pd.ExcelWriter('статистика.xlsx', mode='a', if_sheet_exists= 'replace') as writer:  
+    Alpha_join.to_excel(writer, sheet_name='domena',index = False)
+    Sigma_join.to_excel(writer, sheet_name='domenb',index = False)
+```
+
+На выходе получаем Exel-файл с тем же наименованием, но с обновленными данными.
